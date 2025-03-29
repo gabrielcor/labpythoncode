@@ -4,6 +4,17 @@ from uiflow import *
 from m5mqtt import M5mqtt
 import time, gc
 
+# ─── MQTT INIT ──────────────────────────────────────────────
+import wifiCfg
+
+# wifiCfg.doConnect('blackcrow_prod01', 'e2aVwqCtfc5EsgGE852E')
+wifiCfg.doConnect('blackcrow_01', '8001017170')
+while not wifiCfg.wlan_sta.isconnected():
+    wait_ms(100)
+print("Wi-Fi connected!")
+# m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
+m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
+
 # ─── UI SETUP ──────────────────────────────────────────────
 screen = M5Screen()
 screen.clean_screen()
@@ -13,8 +24,8 @@ screen.set_screen_bg_color(0xFFFFFF)
 image0 = M5Img("res/Background_Inicial_v0.2-min.png", x=0, y=0)
 
 
-btnsi = M5Btn(text='o', x=39, y=192, w=40, h=40, bg_c=0xfca3a3, text_c=0xfca3a3, font=FONT_MONT_14)
-btnno = M5Btn(text='o', x=244, y=192, w=40, h=40, bg_c=0xfca3a3, text_c=0xfca3a3, font=FONT_MONT_14)
+btnsi = M5Btn(text='o', x=39, y=192, w=40, h=40, bg_c=0x56acd3, text_c=0x56acd3, font=FONT_MONT_14)
+btnno = M5Btn(text='o', x=244, y=192, w=40, h=40, bg_c=0x56acd3, text_c=0x56acd3, font=FONT_MONT_14)
 labelsi = M5Label('SI', x=50, y=202, color=0x000, font=FONT_MONT_18)
 labelno = M5Label('NO', x=248, y=202, color=0x000, font=FONT_MONT_18)
 btn_question = M5Btn(text='?', x=237, y=34, w=40, h=40, bg_c=0x76501c, text_c=0xe8b844, font=FONT_MONT_30)
@@ -99,6 +110,10 @@ def handle_message(topic_data):
 
     gc.collect()  # ✅ After handling message and possible UI/image changes
 
+def hide_buttons():
+    for el in [labelsi, labelno, btnsi, btnno, btn_question]:
+        el.set_hidden(True)    
+   
 def btn_question_pressed():
     btn_question.set_hidden(True)
     speaker.playTone(220, 1/8, volume=6)
@@ -108,12 +123,26 @@ def btn_question_pressed():
 def handle_button(btn_id):
     speaker.playTone(220, 1/8, volume=6)
     speaker.playTone(110, 1/8, volume=6)
+    hide_buttons()
     m5mqtt.publish('rllabdevicesend', btn_id)
+
+def btn_si_pressed():
+    speaker.playTone(220, 1/8, volume=6)
+    speaker.playTone(110, 1/8, volume=6)
+    hide_buttons()
+    m5mqtt.publish('rllabdevicesend', 'btnA')
+def btn_no_pressed():
+    speaker.playTone(220, 1/8, volume=6)
+    speaker.playTone(110, 1/8, volume=6)
+    hide_buttons()
+    m5mqtt.publish('rllabdevicesend', 'btnC')
 
 # ─── EVENTS ─────────────────────────────────────────────────
 
 btn_question.pressed(btn_question_pressed)
-# btnsi.pressed(lambda: handle_button('btnA'))
+btnsi.pressed(btn_si_pressed)
+btnno.pressed(btn_no_pressed)
+
 btnA.wasPressed(lambda: handle_button('btnA'))
 btnB.wasPressed(lambda: handle_button('btnB'))
 btnC.wasPressed(lambda: handle_button('btnC'))
@@ -123,16 +152,6 @@ power.setVibrationEnable(False)
 power.setVibrationIntensity(50)
 timerSch.run('timer0', 1000, 0x00)
 
-# ─── MQTT INIT ──────────────────────────────────────────────
-import wifiCfg
-
-# wifiCfg.doConnect('blackcrow_prod01', 'e2aVwqCtfc5EsgGE852E')
-wifiCfg.doConnect('blackcrow_01', '8001017170')
-while not wifiCfg.wlan_sta.isconnected():
-    wait_ms(100)
-print("Wi-Fi connected!")
-# m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
-m5mqtt = M5mqtt('RLLabDevice', '192.168.1.92', 1883, 'mqttuser', 'A1234567#', 300)
 m5mqtt.subscribe('rllabdevice', handle_message)
 m5mqtt.start()
 
