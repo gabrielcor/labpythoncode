@@ -90,7 +90,7 @@ def handle_message(topic_data):
         micropython.mem_info()
         
     elif message_code == '90':
-        for el in [labelsi, labelno, btnsi, btnno, btn_question, label0, image0]:
+        for el in [labelsi, labelno, btnsi, btnno, btn_question, label0]:
             el.set_hidden(True)
         screen.set_screen_brightness(0)
     
