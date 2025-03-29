@@ -1,0 +1,29 @@
+0.08
+Ultima version en UI Flow
+Pasado a Micropython directo para que sea mas estable
+
+0.07
+Funcionando full con buzzer inclusive
+Cambie en lugar de usar el buzzer con tiempo, use el on/off y un wait_ms que no está dando leaks
+
+0.06
+Funcionando sin leaks
+Tuve que quitar el buzzer, pero no se cae.
+
+0.05
+Se modifican los códigos para que tengan dos dígitos
+flujo de node-red más completo
+0.04
+Se agregan codigos:
+- 4: muestra botones de ayuda de SI - NO
+- 5: quita botones de ayuda de SI - NO
+Script inicial de Cassandra
+
+0.03
+En esta version ya lee y graba en la cola MQTT rllabdevice en produccion.
+Tiene codigos especiales:
+
+- 0: borra
+- 1: vibra
+- 2: vibra y sonido
+- 3: solo sonido
