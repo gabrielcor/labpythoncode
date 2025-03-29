@@ -12,10 +12,11 @@ screen.set_screen_bg_color(0xFFFFFF)
 # ─── UI ELEMENTS ────────────────────────────────────────────
 image0 = M5Img("res/Background_Inicial_v0.2-min.png", x=0, y=0)
 
-labelsi = M5Label('SI', x=45, y=202, color=0x000, font=FONT_MONT_18)
+
+btnsi = M5Btn(text='o', x=39, y=192, w=40, h=40, bg_c=0xfca3a3, text_c=0xfca3a3, font=FONT_MONT_14)
+btnno = M5Btn(text='o', x=244, y=192, w=40, h=40, bg_c=0xfca3a3, text_c=0xfca3a3, font=FONT_MONT_14)
+labelsi = M5Label('SI', x=50, y=202, color=0x000, font=FONT_MONT_18)
 labelno = M5Label('NO', x=248, y=202, color=0x000, font=FONT_MONT_18)
-btnsi = M5Btn(text='o', x=49, y=229, w=10, h=10, bg_c=0xd81d1d, text_c=0xd81d1d, font=FONT_MONT_14)
-btnno = M5Btn(text='o', x=258, y=229, w=10, h=10, bg_c=0xd81d1d, text_c=0xd81d1d, font=FONT_MONT_14)
 btn_question = M5Btn(text='?', x=237, y=34, w=40, h=40, bg_c=0x76501c, text_c=0xe8b844, font=FONT_MONT_30)
 label_time = M5Label('0:00:00', x=25, y=46, color=0x3ba0ab, font=FONT_MONT_18)
 label0 = M5Label('12345678901234567890123451234', x=12, y=118, color=0x2d672c, font=FONT_MONT_18)
@@ -112,6 +113,7 @@ def handle_button(btn_id):
 # ─── EVENTS ─────────────────────────────────────────────────
 
 btn_question.pressed(btn_question_pressed)
+# btnsi.pressed(lambda: handle_button('btnA'))
 btnA.wasPressed(lambda: handle_button('btnA'))
 btnB.wasPressed(lambda: handle_button('btnB'))
 btnC.wasPressed(lambda: handle_button('btnC'))
