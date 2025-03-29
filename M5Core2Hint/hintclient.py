@@ -4,21 +4,11 @@ from uiflow import *
 from m5mqtt import M5mqtt
 import time, gc
 
-# ─── MQTT INIT ──────────────────────────────────────────────
-import wifiCfg
-
-# wifiCfg.doConnect('blackcrow_prod01', 'e2aVwqCtfc5EsgGE852E')
-wifiCfg.doConnect('blackcrow_01', '8001017170')
-while not wifiCfg.wlan_sta.isconnected():
-    wait_ms(100)
-print("Wi-Fi connected!")
-# m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
-m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
 
 # ─── UI SETUP ──────────────────────────────────────────────
 screen = M5Screen()
 screen.clean_screen()
-screen.set_screen_bg_color(0xFFFFFF)
+screen.set_screen_bg_color(0xffffff)        
 
 # ─── UI ELEMENTS ────────────────────────────────────────────
 image0 = M5Img("res/Background_Inicial_v0.2-min.png", x=0, y=0)
@@ -98,9 +88,15 @@ def handle_message(topic_data):
 
     elif message_code == '08':
         micropython.mem_info()
-
+        
+    elif message_code == '90':
+        for el in [labelsi, labelno, btnsi, btnno, btn_question, label0, image0]:
+            el.set_hidden(True)
+        screen.set_screen_brightness(0)
+    
     elif message_code == '91':
-        pass
+        image0.set_hidden(False)
+        screen.set_screen_brightness(100)
 
     else:
         label0.set_text(topic_output)
@@ -151,6 +147,17 @@ btnC.wasPressed(lambda: handle_button('btnC'))
 power.setVibrationEnable(False)
 power.setVibrationIntensity(50)
 timerSch.run('timer0', 1000, 0x00)
+
+# ─── MQTT INIT ──────────────────────────────────────────────
+import wifiCfg
+
+# wifiCfg.doConnect('blackcrow_prod01', 'e2aVwqCtfc5EsgGE852E')
+wifiCfg.doConnect('blackcrow_01', '8001017170')
+while not wifiCfg.wlan_sta.isconnected():
+    wait_ms(100)
+print("Wi-Fi connected!")
+# m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
+m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
 
 m5mqtt.subscribe('rllabdevice', handle_message)
 m5mqtt.start()
