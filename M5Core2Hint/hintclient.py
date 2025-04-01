@@ -89,14 +89,32 @@ def handle_message(topic_data):
     elif message_code == '08':
         micropython.mem_info()
         
+    # apagar pantalla
     elif message_code == '90':
         for el in [labelsi, labelno, btnsi, btnno, btn_question, label0]:
             el.set_hidden(True)
         screen.set_screen_brightness(0)
     
+    # encender pantalla
     elif message_code == '91':
         image0.set_hidden(False)
         screen.set_screen_brightness(100)
+    
+    # reportar la batería del dispositivo
+    elif message_code == '92':
+        tempnada = '92:'
+        tempnada = tempnada + str(power.getBatPercent()) + ','
+        tempnada = tempnada +  str(power.getBatVoltage())+ ','
+        tempnada = tempnada + str(power.getBatCurrent())
+        m5mqtt.publish('rllabdevicesend', tempnada)
+
+    # resetear
+    elif message_code == '93':
+        power.restart_after_seconds(2)
+
+    # apagar
+    elif message_code == '94':
+        power.powerOff()
 
     else:
         label0.set_text(topic_output)
