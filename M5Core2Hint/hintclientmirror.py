@@ -4,6 +4,19 @@ from uiflow import *
 from m5mqtt import M5mqtt
 import time, gc
 
+# ─── DEVICE SETUP ──────────────────────────────────────────────
+mqttqueue = 'rllabdevice2'
+wifinetwork = 'blackcrow_prod01'
+wifipass = 'e2aVwqCtfc5EsgGE852E'
+# 01
+# mqttqueue = 'rllabdevice'
+# wifinetwork = 'blackcrow_prod01'
+# wifipass = 'e2aVwqCtfc5EsgGE852E'
+
+# m5mqtt = M5mqtt('RLLabDevice2', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
+# m5mqtt.subscribe('rllabdevice2', handle_message)
+
+# wifiCfg.doConnect('blackcrow_01', '8001017170')
 
 # ─── UI SETUP ──────────────────────────────────────────────
 screen = M5Screen()
@@ -106,7 +119,7 @@ def handle_message(topic_data):
         tempnada = tempnada + str(power.getBatPercent()) + ','
         tempnada = tempnada +  str(power.getBatVoltage())+ ','
         tempnada = tempnada + str(power.getBatCurrent())
-        m5mqtt.publish('rllabdevicesend', tempnada)
+        m5mqtt.publish(mqttqueue, tempnada)
 
     # resetear
     elif message_code == '93':
@@ -132,24 +145,24 @@ def btn_question_pressed():
     btn_question.set_hidden(True)
     speaker.playTone(220, 1/8, volume=6)
     speaker.playTone(110, 1/8, volume=6)
-    m5mqtt.publish('rllabdevicesend', 'btnQ')
+    m5mqtt.publish(mqttqueue, 'btnQ')
 
 def handle_button(btn_id):
     speaker.playTone(220, 1/8, volume=6)
     speaker.playTone(110, 1/8, volume=6)
     hide_buttons()
-    m5mqtt.publish('rllabdevicesend', btn_id)
+    m5mqtt.publish(mqttqueue, btn_id)
 
 def btn_si_pressed():
     speaker.playTone(220, 1/8, volume=6)
     speaker.playTone(110, 1/8, volume=6)
     hide_buttons()
-    m5mqtt.publish('rllabdevicesend', 'btnA')
+    m5mqtt.publish(mqttqueue, 'btnA')
 def btn_no_pressed():
     speaker.playTone(220, 1/8, volume=6)
     speaker.playTone(110, 1/8, volume=6)
     hide_buttons()
-    m5mqtt.publish('rllabdevicesend', 'btnC')
+    m5mqtt.publish(mqttqueue, 'btnC')
 
 # ─── EVENTS ─────────────────────────────────────────────────
 
@@ -169,15 +182,17 @@ timerSch.run('timer0', 1000, 0x00)
 # ─── MQTT INIT ──────────────────────────────────────────────
 import wifiCfg
 
-wifiCfg.doConnect('blackcrow_prod01', 'e2aVwqCtfc5EsgGE852E')
-# wifiCfg.doConnect('blackcrow_01', '8001017170')
+wifiCfg.doConnect(wifinetwork,wifipass)
 while not wifiCfg.wlan_sta.isconnected():
     wait_ms(100)
 print("Wi-Fi connected!")
-# m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
-m5mqtt = M5mqtt('RLLabDevice', '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
+print("m5mqtt init")
+m5mqtt = M5mqtt(mqttqueue, '192.168.70.113', 1883, 'mqttuser', 'A1234567#', 300)
+print("m5mqtt subscribe")
+m5mqtt.subscribe(mqttqueue, handle_message)
+print("m5mqtt ready")
 
-m5mqtt.subscribe('rllabdevice', handle_message)
+
 m5mqtt.start()
 
 
