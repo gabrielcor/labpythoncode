@@ -17,7 +17,7 @@ print("MAC Address:", mac_str)
 
 if (mac_str == '2C:BC:BB:82:92:F0'):  # main device
     mqttqueue = 'rllabdevice'
-    mqttqueuesend = 'rllabdevicesend2'
+    mqttqueuesend = 'rllabdevicesend'
     print("Main device")
 else:
     mqttqueue = 'rllabdevice2'
