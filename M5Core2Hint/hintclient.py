@@ -8,6 +8,17 @@ import time, gc
 
 import network
 
+atHome = True
+if atHome:
+    primary_network = 'blackcrow_01'
+    primary_pass = '8001017170'
+else:
+    primary_network = 'blackcrow_prod01'
+    primary_pass = 'e2aVwqCtfc5EsgGE852E'
+    secondary_network = 'blackcrow_01'
+    secondary_pass = '8001017170'
+
+
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)  # ⚠️ Important: ensure the interface is active
 
@@ -107,6 +118,9 @@ def handle_message(topic_data):
 
     elif message_code == '08':
         micropython.mem_info()
+
+    elif message_code == '14':
+        speaker.playWAV('/flash/res/ding_dis.wav', volume=6)
         
     # apagar pantalla
     elif message_code == '90':
@@ -188,24 +202,20 @@ timerSch.run('timer0', 1000, 0x00)
 # ─── MQTT INIT ──────────────────────────────────────────────
 import wifiCfg
 
+print("Starting Wifi")
+
 MAX_RETRIES = 5
 RETRY_DELAY_MS = 200
-wifiCfg.doConnect('blackcrow_prod01', 'e2aVwqCtfc5EsgGE852E')
+wifiCfg.doConnect(primary_network, primary_pass)
 connected = False
-for i in range(MAX_RETRIES):
-    if wifiCfg.wlan_sta.isconnected():
-        connected = True
-        break
-    wait_ms(RETRY_DELAY_MS)
+if wifiCfg.wlan_sta.isconnected():
+   connected = True
 
 if not connected:
     print("Primary network failed. Trying fallback...")
-    wifiCfg.doConnect('blackcrow_01', '8001017170')
-    for i in range(MAX_RETRIES):
-        if wifiCfg.wlan_sta.isconnected():
-            connected = True
-            break
-        wait_ms(RETRY_DELAY_MS)
+    wifiCfg.doConnect(secondary_network, secondary_pass)
+    if wifiCfg.wlan_sta.isconnected():
+       connected = True
 
 if connected:
     print("Wi-Fi connected:", wifiCfg.wlan_sta.ifconfig()[0])
