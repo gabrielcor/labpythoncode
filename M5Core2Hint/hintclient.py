@@ -83,7 +83,7 @@ def ttimer0():
     update_timer()
 
 def handle_message(topic_data):
-    global topic_output, message_code
+    global topic_output, message_code, total_seconds
     topic_output = topic_data
     message_code = topic_output[:2]
     print("Received code:",message_code)
@@ -146,9 +146,23 @@ def handle_message(topic_data):
         power.restart_after_seconds(2)
 
     # apagar
-    elif message_code == '94':
-        power.powerOff()
+    # elif message_code == '94':
+    #    power.powerOff()
 
+    elif message_code == '95':
+        try:
+            seconds_str = topic_output[3:]  # Skip "95:"
+            new_seconds = int(seconds_str)
+            total_seconds = max(new_seconds, 0)
+            print("Set total_seconds to:", total_seconds)
+        except Exception as e:
+            print("Invalid format for 95 message:", topic_output, e)        
+    # reportar el tiempo en el dispositivo
+    elif message_code == '96':
+        tempx = '96:'
+        tempx = tempx + str(total_seconds) 
+        m5mqtt.publish(mqttqueuesend, tempx)
+        
     else:
         label0.set_text(topic_output)
         image0.set_img_src("res/Background_withLet-min-v0.2.png")
