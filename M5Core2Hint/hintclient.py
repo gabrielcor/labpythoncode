@@ -48,7 +48,12 @@ btnsi = M5Btn(text='o', x=39, y=192, w=40, h=40, bg_c=0x56acd3, text_c=0x56acd3,
 btnno = M5Btn(text='o', x=244, y=192, w=40, h=40, bg_c=0x56acd3, text_c=0x56acd3, font=FONT_MONT_14)
 labelsi = M5Label('SI', x=50, y=202, color=0x000, font=FONT_MONT_18)
 labelno = M5Label('NO', x=248, y=202, color=0x000, font=FONT_MONT_18)
+
+# question button
 btn_question = M5Btn(text='?', x=237, y=34, w=40, h=40, bg_c=0x76501c, text_c=0xe8b844, font=FONT_MONT_30)
+glow_enabled = False
+glow_phase = 0
+
 label_time = M5Label('0:00:00', x=25, y=46, color=0x3ba0ab, font=FONT_MONT_18)
 label0 = M5Label('12345678901234567890123451234', x=12, y=118, color=0x2d672c, font=FONT_MONT_18)
 label0.set_long_mode(1)
@@ -82,6 +87,16 @@ def update_timer():
 def ttimer0():
     update_timer()
 
+# timer for glow
+@timerSch.event('timer_glow')
+def glow_timer():
+    global glow_phase
+    if glow_enabled:
+        # Pulse effect between two colors
+        colors = [0x76501c, 0xebb04b]  # dark brown → yellowish
+        btn_question.set_bg_color(colors[glow_phase % len(colors)])
+        glow_phase += 1
+        
 def handle_message(topic_data):
     global topic_output, message_code, total_seconds
     topic_output = topic_data
@@ -112,8 +127,15 @@ def handle_message(topic_data):
 
     elif message_code == '10':
         btn_question.set_hidden(False)
+        global glow_enabled, glow_phase
+        glow_enabled = True
+        glow_phase = 0
+        timerSch.run('timer_glow', 400, 0x00)  # Change every 400 ms        
 
     elif message_code == '11':
+        glow_enabled = False
+        timerSch.stop('timer_glow')
+        btn_question.set_bg_color(0x76501c)  # Reset to original color
         btn_question.set_hidden(True)
 
     elif message_code == '08':
