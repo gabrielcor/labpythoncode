@@ -92,10 +92,28 @@ def ttimer0():
 def glow_timer():
     global glow_phase
     if glow_enabled:
-        # Pulse effect between two colors
-        colors = [0x76501c, 0xebb04b]  # dark brown → yellowish
-        btn_question.set_bg_color(colors[glow_phase % len(colors)])
-        glow_phase += 1
+        steps = 4  # Total steps from dark → light → dark
+        half_steps = steps // 2
+
+        # RGB: dark brown → lighter brown
+        start_color = (0x76, 0x50, 0x1c)  # 0x76501c
+        end_color   = (0x8a, 0x62, 0x28)  # 0x8a6228
+
+        # Create ping-pong effect
+        phase = glow_phase % steps
+        if phase >= half_steps:
+            t = 1 - (phase - half_steps) / float(half_steps)
+        else:
+            t = phase / float(half_steps)
+
+        r = int(start_color[0] + (end_color[0] - start_color[0]) * t)
+        g = int(start_color[1] + (end_color[1] - start_color[1]) * t)
+        b = int(start_color[2] + (end_color[2] - start_color[2]) * t)
+
+        hex_color = (r << 16) + (g << 8) + b
+        btn_question.set_bg_color(hex_color)
+
+        glow_phase = (glow_phase + 1) % steps
         
 def handle_message(topic_data):
     global topic_output, message_code, total_seconds
@@ -130,7 +148,7 @@ def handle_message(topic_data):
         global glow_enabled, glow_phase
         glow_enabled = True
         glow_phase = 0
-        timerSch.run('timer_glow', 400, 0x00)  # Change every 400 ms        
+        timerSch.run('timer_glow', 250, 0x00)  # Change every 250 ms        
 
     elif message_code == '11':
         glow_enabled = False
