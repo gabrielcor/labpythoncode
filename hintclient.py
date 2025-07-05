@@ -76,7 +76,7 @@ gc.collect()  # ✅ After UI setup
 topic_output = None
 message_code = ''
 total_seconds = 35940 # 3600  # Initial time in seconds
-
+has_synced_95 = 0
 # ─── FUNCTIONS ──────────────────────────────────────────────
 
 def formattime(h, m, s):
@@ -123,7 +123,7 @@ def glow_timer():
         glow_phase = (glow_phase + 1) % steps
         
 def handle_message(topic_data):
-    global topic_output, message_code, total_seconds
+    global topic_output, message_code, total_seconds, has_synced_95
     topic_output = topic_data
     message_code = topic_output[:2]
     print("Received code:",message_code)
@@ -203,13 +203,19 @@ def handle_message(topic_data):
             new_seconds = int(seconds_str)
             total_seconds = max(new_seconds, 0)
             print("Set total_seconds to:", total_seconds)
+            has_synced_95 = 1
         except Exception as e:
             print("Invalid format for 95 message:", topic_output, e)        
     # reportar el tiempo en el dispositivo
     elif message_code == '96':
-        tempx = '96:'
-        tempx = tempx + str(total_seconds) 
-        m5mqtt.publish(mqttqueuesend, tempx)
+        if has_synced_95 == 1:
+            tempx = '96:'
+            tempx = tempx + str(total_seconds) 
+            m5mqtt.publish(mqttqueuesend, tempx)
+        else:
+            tempx = '95:'
+            m5mqtt.publish(mqttqueuesend, tempx)
+            
         
     else:
         label0.set_text(topic_output)
