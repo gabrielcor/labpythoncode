@@ -49,15 +49,6 @@ btnno = M5Btn(text='o', x=244, y=192, w=40, h=40, bg_c=0x56acd3, text_c=0x56acd3
 labelsi = M5Label('SI', x=50, y=202, color=0x000, font=FONT_MONT_18)
 labelno = M5Label('NO', x=248, y=202, color=0x000, font=FONT_MONT_18)
 
-
-# glowing background for the question button
-btn_glow_back = M5Btn(text='', x=221, y=18, w=72, h=72, bg_c=0x422b07, text_c=0x422b07)
-sx_style = lv.style_t() # create the style
-sx_style.set_border_width(lv.STATE.DEFAULT, 0)  # thickness
-btn_glow_back.obj.add_style(lv.obj.PART.MAIN, sx_style)
-btn_glow_back.set_hidden(True)
-
-
 # question button
 btn_question = M5Btn(text='?', x=227, y=24, w=60, h=60, bg_c=0x76501c, text_c=0xe8b844, font=FONT_MONT_30)
 # print(dir(btn_question)) ## show available properties for btn_question
@@ -129,16 +120,6 @@ def glow_timer():
         b = int(start_color[2] + (end_color[2] - start_color[2]) * t)
         hex_color = (r << 16) + (g << 8) + b
         btn_question.set_bg_color(hex_color)
-
-      # btn_glow_back (halo) → de 0x422b07 a 0xFFFFFF
-        # bg_start = (0x42, 0x2b, 0x07)
-        # bg_end   = (0xFF, 0xFF, 0xFF)
-        # r_bg = int(bg_start[0] + (bg_end[0] - bg_start[0]) * t)
-        # g_bg = int(bg_start[1] + (bg_end[1] - bg_start[1]) * t)
-        # b_bg = int(bg_start[2] + (bg_end[2] - bg_start[2]) * t)
-        # hex_bg = (r_bg << 16) + (g_bg << 8) + b_bg
-        # btn_glow_back.set_bg_color(hex_bg)
-
         glow_phase = (glow_phase + 1) % steps
         
 def handle_message(topic_data):
@@ -170,7 +151,6 @@ def handle_message(topic_data):
             el.set_hidden(True)
 
     elif message_code == '10':
-        btn_glow_back.set_hidden(False)
         btn_question.set_hidden(False)
         global glow_enabled, glow_phase
         glow_enabled = True
@@ -183,7 +163,6 @@ def handle_message(topic_data):
         timerSch.stop('timer_glow')
         btn_question.set_bg_color(0x76501c)  # Reset to original color
         btn_question.set_hidden(True)
-        btn_glow_back.set_hidden(True)
 
     elif message_code == '08':
         micropython.mem_info()
