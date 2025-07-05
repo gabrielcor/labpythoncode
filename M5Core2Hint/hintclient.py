@@ -53,6 +53,7 @@ labelno = M5Label('NO', x=248, y=202, color=0x000, font=FONT_MONT_18)
 btn_question = M5Btn(text='?', x=237, y=34, w=40, h=40, bg_c=0x76501c, text_c=0xe8b844, font=FONT_MONT_30)
 glow_enabled = False
 glow_phase = 0
+TIMER_GLOW_MS = 200
 
 label_time = M5Label('0:00:00', x=25, y=46, color=0x3ba0ab, font=FONT_MONT_18)
 label0 = M5Label('12345678901234567890123451234', x=12, y=118, color=0x2d672c, font=FONT_MONT_18)
@@ -92,7 +93,7 @@ def ttimer0():
 def glow_timer():
     global glow_phase
     if glow_enabled:
-        steps = 4  # Total steps from dark → light → dark
+        steps = 8  # Total steps from dark → light → dark
         half_steps = steps // 2
 
         # RGB: dark brown → lighter brown
@@ -148,7 +149,8 @@ def handle_message(topic_data):
         global glow_enabled, glow_phase
         glow_enabled = True
         glow_phase = 0
-        timerSch.run('timer_glow', 250, 0x00)  # Change every 250 ms        
+
+        timerSch.run('timer_glow', TIMER_GLOW_MS, 0x00)  # Change every x ms        
 
     elif message_code == '11':
         glow_enabled = False
