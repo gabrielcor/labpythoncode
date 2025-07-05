@@ -63,7 +63,7 @@ glow_phase = 0
 TIMER_GLOW_MS = 200
 
 label_time = M5Label('0:00:00', x=25, y=46, color=0x3ba0ab, font=FONT_MONT_18)
-label0 = M5Label('12345678901234567890123451234', x=12, y=118, color=0x4f3308, font=FONT_MONT_18)
+label0 = M5Label('12345678901234567890123451234', x=12, y=118, color=0xffffff, font=FONT_MONT_18)
 label0.set_long_mode(1)
 
 # Initial UI state
@@ -213,7 +213,7 @@ def handle_message(topic_data):
         
     else:
         label0.set_text(topic_output)
-        image0.set_img_src("res/Background_withLet-min-v0.2.png")
+        image0.set_img_src("res/Background_Inicial_v0.2-blur.png")
         label0.set_hidden(False)
         print(topic_output)
 
