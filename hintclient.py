@@ -54,7 +54,7 @@ btn_question = M5Btn(text='?', x=227, y=24, w=60, h=60, bg_c=0x76501c, text_c=0x
 # print(dir(btn_question)) ## show available properties for btn_question
 se_style = lv.style_t() # create the style
 se_style.set_border_width(lv.STATE.DEFAULT, 6)  # thickness
-se_style.set_border_color(lv.STATE.DEFAULT,lv.color_hex(0x8a6228)) #0x8a6228
+se_style.set_border_color(lv.STATE.DEFAULT,lv.color_hex(0x422b07)) #0x8a6228
 se_style.set_radius(lv.STATE.DEFAULT, lv.RADIUS.CIRCLE)
 btn_question.obj.add_style(lv.obj.PART.MAIN, se_style)
 
@@ -63,7 +63,7 @@ btn_question.obj.add_style(lv.obj.PART.MAIN, se_style)
 
 glow_enabled = False
 glow_phase = 0
-TIMER_GLOW_MS = 200
+TIMER_GLOW_MS = 200 # timer 
 
 label_time = M5Label('0:00:00', x=25, y=46, color=0x3ba0ab, font=FONT_MONT_18)
 label0 = M5Label('12345678901234567890123451234', x=12, y=118, color=0x2d672c, font=FONT_MONT_18)
@@ -123,6 +123,18 @@ def glow_timer():
         b = int(start_color[2] + (end_color[2] - start_color[2]) * t)
         hex_color = (r << 16) + (g << 8) + b
         btn_question.set_bg_color(hex_color)
+
+        # border color
+        br_start = (0x42, 0x2b, 0x07)  # 0x422b07
+        br_end   = (0xff, 0xff, 0xff)  # white
+        r_br = int(br_start[0] + (br_end[0] - br_start[0]) * t)
+        g_br = int(br_start[1] + (br_end[1] - br_start[1]) * t)
+        b_br = int(br_start[2] + (br_end[2] - br_start[2]) * t)
+        hex_br = (r_br << 16) + (g_br << 8) + b_br
+
+        btn_question.obj.set_style_local_border_color(
+            lv.obj.PART.MAIN, lv.STATE.DEFAULT, lv.color_hex(hex_br)
+        )
 
         
         glow_phase = (glow_phase + 1) % steps
