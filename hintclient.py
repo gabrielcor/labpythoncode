@@ -50,7 +50,7 @@ labelsi = M5Label('SI', x=50, y=202, color=0x000, font=FONT_MONT_18)
 labelno = M5Label('NO', x=248, y=202, color=0x000, font=FONT_MONT_18)
 
 # question button
-btn_question = M5Btn(text='?', x=227, y=24, w=60, h=60, bg_c=0x76501c, text_c=0xe8b844, font=FONT_MONT_30)
+btn_question = M5Btn(text='?', x=237, y=24, w=60, h=60, bg_c=0x76501c, text_c=0xe8b844, font=FONT_MONT_30)
 # print(dir(btn_question)) ## show available properties for btn_question
 se_style = lv.style_t() # create the style
 se_style.set_border_width(lv.STATE.DEFAULT, 4)  # thickness
