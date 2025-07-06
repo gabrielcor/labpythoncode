@@ -137,6 +137,12 @@ def show_btn_question():
 
     timerSch.run('timer_glow', TIMER_GLOW_MS, 0x00)  # Change every x ms        
     
+def hide_btn_question():
+    glow_enabled = False
+    timerSch.stop('timer_glow')
+    btn_question.set_bg_color(0x76501c)  # Reset to original color
+    btn_question.set_hidden(True)
+
 
 def handle_message(topic_data):
     global topic_output, message_code, total_seconds, has_synced_95
@@ -167,10 +173,7 @@ def handle_message(topic_data):
         show_btn_question()
 
     elif message_code == '11':
-        glow_enabled = False
-        timerSch.stop('timer_glow')
-        btn_question.set_bg_color(0x76501c)  # Reset to original color
-        btn_question.set_hidden(True)
+        hide_btn_question()
 
     elif message_code == '08':
         micropython.mem_info()
