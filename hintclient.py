@@ -229,6 +229,7 @@ def handle_message(topic_data):
             
         
     else:
+        show_btn_question()
         label0.set_text(topic_output)
         image0.set_img_src("res/Background_Inicial_v0.2-blur.png")
         label0.set_hidden(False)
