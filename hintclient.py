@@ -8,7 +8,7 @@ import time, gc
 
 import network
 
-atHome = False
+atHome = True
 if atHome:
     primary_network = 'blackcrow_01'
     primary_pass = '8001017170'
@@ -79,6 +79,7 @@ total_seconds = 35940 # 3600  # Initial time in seconds
 has_synced_95 = 0
 # ─── FUNCTIONS ──────────────────────────────────────────────
 
+
 def formattime(h, m, s):
     return "{}:{:02}:{:02}".format(h, m, s)
 
@@ -121,7 +122,22 @@ def glow_timer():
         hex_color = (r << 16) + (g << 8) + b
         btn_question.set_bg_color(hex_color)
         glow_phase = (glow_phase + 1) % steps
-        
+
+def reset_ui():
+    label0.set_hidden(True)
+    image0.set_img_src("res/Background_Inicial_v0.2-min.png")
+    for el in [labelsi, labelno, btnsi, btnno, btn_question]:
+        el.set_hidden(True)
+
+def show_btn_question():
+    btn_question.set_hidden(False)
+    global glow_enabled, glow_phase
+    glow_enabled = True
+    glow_phase = 0
+
+    timerSch.run('timer_glow', TIMER_GLOW_MS, 0x00)  # Change every x ms        
+    
+
 def handle_message(topic_data):
     global topic_output, message_code, total_seconds, has_synced_95
     topic_output = topic_data
@@ -129,10 +145,7 @@ def handle_message(topic_data):
     print("Received code:",message_code)
 
     if message_code == '00':
-        label0.set_hidden(True)
-        image0.set_img_src("res/Background_Inicial_v0.2-min.png")
-        for el in [labelsi, labelno, btnsi, btnno, btn_question]:
-            el.set_hidden(True)
+        reset_ui()
 
     elif message_code == '01':
         power.setVibrationEnable(True)
@@ -151,12 +164,7 @@ def handle_message(topic_data):
             el.set_hidden(True)
 
     elif message_code == '10':
-        btn_question.set_hidden(False)
-        global glow_enabled, glow_phase
-        glow_enabled = True
-        glow_phase = 0
-
-        timerSch.run('timer_glow', TIMER_GLOW_MS, 0x00)  # Change every x ms        
+        show_btn_question()
 
     elif message_code == '11':
         glow_enabled = False
@@ -233,6 +241,7 @@ def btn_question_pressed():
     btn_question.set_hidden(True)
     speaker.playTone(220, 1/8, volume=6)
     speaker.playTone(110, 1/8, volume=6)
+    reset_ui()
     m5mqtt.publish(mqttqueuesend, 'btnQ')
 
 def handle_button(btn_id):
