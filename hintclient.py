@@ -8,7 +8,7 @@ import time, gc
 
 import network
 
-atHome = True
+atHome = False
 if atHome:
     primary_network = 'blackcrow_01'
     primary_pass = '8001017170'
