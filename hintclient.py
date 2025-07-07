@@ -67,6 +67,13 @@ label0 = M5Label('12345678901234567890123451234', x=12, y=118, color=0xffffff, f
 label0.set_long_mode(1)
 
 # Initial UI state
+
+btnquestion_visible = False
+btnA_visible = False
+btnB_visible = False
+btnC_visible = False
+
+
 for el in [labelsi, labelno, btnsi, btnno, btn_question, label0]:
     el.set_hidden(True)
 
@@ -78,7 +85,6 @@ message_code = ''
 total_seconds = 35940 # 3600  # Initial time in seconds
 has_synced_95 = 0
 # ─── FUNCTIONS ──────────────────────────────────────────────
-
 
 def formattime(h, m, s):
     return "{}:{:02}:{:02}".format(h, m, s)
@@ -123,22 +129,33 @@ def glow_timer():
         btn_question.set_bg_color(hex_color)
         glow_phase = (glow_phase + 1) % steps
 
+def todos_btn_novisible():
+    global btnquestion_visible, btnA_visible, btnB_visible, btnC_visible
+    btnquestion_visible = False
+    btnA_visible = False
+    btnB_visible = False
+    btnC_visible = False
+
 def reset_ui():
     label0.set_hidden(True)
     image0.set_img_src("res/Background_Inicial_v0.2-min.png")
     for el in [labelsi, labelno, btnsi, btnno, btn_question]:
         el.set_hidden(True)
+    todos_btn_novisible()
 
 def show_btn_question():
     btn_question.set_hidden(False)
-    global glow_enabled, glow_phase
+    global glow_enabled, glow_phase, btnquestion_visible
     glow_enabled = True
     glow_phase = 0
+    btnquestion_visible = True
 
     timerSch.run('timer_glow', TIMER_GLOW_MS, 0x00)  # Change every x ms        
     
 def hide_btn_question():
+    global btnquestion_visible, glow_enabled
     glow_enabled = False
+    btnquestion_visible = False
     timerSch.stop('timer_glow')
     btn_question.set_bg_color(0x76501c)  # Reset to original color
     btn_question.set_hidden(True)
@@ -162,12 +179,18 @@ def handle_message(topic_data):
         speaker.playTone(784, 1, volume=5)
 
     elif message_code == '04':
+        global btnA_visible, btnC_visible
         for el in [labelsi, labelno, btnsi, btnno]:
             el.set_hidden(False)
+        btnA_visible = True
+        btnC_visible = True
 
     elif message_code == '05':
+        global btnA_visible, btnC_visible
         for el in [labelsi, labelno, btnsi, btnno]:
             el.set_hidden(True)
+        btnA_visible = False
+        btnC_visible = False
 
     elif message_code == '10':
         show_btn_question()
@@ -185,6 +208,7 @@ def handle_message(topic_data):
     elif message_code == '90':
         for el in [labelsi, labelno, btnsi, btnno, btn_question, label0]:
             el.set_hidden(True)
+        todos_btn_novisible()
         screen.set_screen_brightness(0)
     
     # encender pantalla
@@ -229,6 +253,7 @@ def handle_message(topic_data):
             
         
     else:
+        global btnquestion_visible
         show_btn_question()
         label0.set_text(topic_output)
         image0.set_img_src("res/Background_Inicial_v0.2-blur.png")
@@ -240,30 +265,40 @@ def handle_message(topic_data):
 def hide_buttons():
     for el in [labelsi, labelno, btnsi, btnno, btn_question]:
         el.set_hidden(True)    
-   
+    todos_btn_novisible()
+
 def btn_question_pressed():
-    btn_question.set_hidden(True)
-    speaker.playTone(220, 1/8, volume=6)
-    speaker.playTone(110, 1/8, volume=6)
-    reset_ui()
-    m5mqtt.publish(mqttqueuesend, 'btnQ')
+    global btnquestion_visible
+    if btnquestion_visible:
+        btnquestion_visible = False
+        btn_question.set_hidden(True)
+        speaker.playTone(220, 1/8, volume=6)
+        speaker.playTone(110, 1/8, volume=6)
+        reset_ui()
+        m5mqtt.publish(mqttqueuesend, 'btnQ')
 
 def handle_button(btn_id):
-    speaker.playTone(220, 1/8, volume=6)
-    speaker.playTone(110, 1/8, volume=6)
-    hide_buttons()
-    m5mqtt.publish(mqttqueuesend, btn_id)
+    global btnA_visible, btnB_visible, btnC_visible
+    if ((btnA_visible and btn_id == "btnA") or (btnB_visible and btn_id == "btnB") or (btnC_visible and btn_id == "btnC")):
+        speaker.playTone(220, 1/8, volume=6)
+        speaker.playTone(110, 1/8, volume=6)
+        hide_buttons()
+        m5mqtt.publish(mqttqueuesend, btn_id)
 
 def btn_si_pressed():
-    speaker.playTone(220, 1/8, volume=6)
-    speaker.playTone(110, 1/8, volume=6)
-    hide_buttons()
-    m5mqtt.publish(mqttqueuesend, 'btnA')
+    global btnA_visible
+    if (btnA_visible):
+        speaker.playTone(220, 1/8, volume=6)
+        speaker.playTone(110, 1/8, volume=6)
+        hide_buttons()
+        m5mqtt.publish(mqttqueuesend, 'btnA')
 def btn_no_pressed():
-    speaker.playTone(220, 1/8, volume=6)
-    speaker.playTone(110, 1/8, volume=6)
-    hide_buttons()
-    m5mqtt.publish(mqttqueuesend, 'btnC')
+    global btnC_visible
+    if (btnC_visible):
+        speaker.playTone(220, 1/8, volume=6)
+        speaker.playTone(110, 1/8, volume=6)
+        hide_buttons()
+        m5mqtt.publish(mqttqueuesend, 'btnC')
 
 # ─── EVENTS ─────────────────────────────────────────────────
 
